@@ -1,7 +1,9 @@
 package api
 
-import "net/http"
+import (
+	"github.com/go-chi/chi/v5"
+)
 
-func (api *API) NewRouter() *http.ServeMux {
-	return http.NewServeMux()
+func (api *API) NewRouter() *chi.Mux {
+	return chi.NewRouter()
 }
