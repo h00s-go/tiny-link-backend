@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/h00s-go/tiny-link-backend/config"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -45,4 +46,25 @@ func (db *Database) ConnString() string {
 		db.config.Password,
 		db.config.Name,
 	)
+}
+
+func (db *Database) Migrate() error {
+	if _, err := db.conn.Exec(context.Background(), sqlCreateSchema); err != nil {
+		return err
+	}
+
+	var version string
+	err := db.conn.QueryRow(context.Background(), sqlSelectSchema).Scan(&version)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			if _, err = db.conn.Exec(context.Background(), sqlInsertSchema); err != nil {
+				return err
+			}
+		} else {
+			return errors.New("Unable to scan row: " + err.Error())
+		}
+		return err
+	}
+
+	return nil
 }

@@ -18,6 +18,9 @@ func main() {
 	if err := db.Connect(); err != nil {
 		logger.Fatal(err)
 	}
+	if err := db.Migrate(); err != nil {
+		logger.Fatal(err)
+	}
 	defer db.Close()
 
 	api := api.NewAPI(config, db, logger)
