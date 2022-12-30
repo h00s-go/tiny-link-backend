@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/h00s-go/tiny-link-backend/config"
+	"github.com/h00s-go/tiny-link-backend/db/sql"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -49,15 +50,15 @@ func (db *Database) ConnString() string {
 }
 
 func (db *Database) Migrate() error {
-	if _, err := db.conn.Exec(context.Background(), sqlCreateSchema); err != nil {
+	if _, err := db.conn.Exec(context.Background(), sql.CreateSchema); err != nil {
 		return err
 	}
 
 	var version string
-	err := db.conn.QueryRow(context.Background(), sqlSelectSchema).Scan(&version)
+	err := db.conn.QueryRow(context.Background(), sql.SelectSchema).Scan(&version)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			if _, err = db.conn.Exec(context.Background(), sqlInsertSchema); err != nil {
+			if _, err = db.conn.Exec(context.Background(), sql.InsertSchema); err != nil {
 				return err
 			}
 		} else {

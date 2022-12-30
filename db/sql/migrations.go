@@ -1,15 +1,15 @@
-package db
+package sql
 
-const sqlCreateSchema = `
+const CreateSchema = `
 	CREATE TABLE IF NOT EXISTS schema_migrations (
 		version integer
 	);
 `
 
-const sqlSelectSchema = `
+const SelectSchema = `
 	SELECT * FROM schema_migrations;
 `
 
-const sqlInsertSchema = `
+const InsertSchema = `
 	INSERT INTO schema_migrations (version) VALUES (0);
 `
