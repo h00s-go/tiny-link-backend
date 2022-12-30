@@ -38,11 +38,11 @@ func (db *Database) Close() {
 }
 
 func (db *Database) ConnString() string {
-	return fmt.Sprintf("user=%s password=%s host=%s port=%s dbname=%s pool_max_conns=10 pool_min_conns=2",
-		db.config.User,
-		db.config.Password,
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s pool_max_conns=10 pool_min_conns=2",
 		db.config.Host,
 		db.config.Port,
+		db.config.User,
+		db.config.Password,
 		db.config.Name,
 	)
 }

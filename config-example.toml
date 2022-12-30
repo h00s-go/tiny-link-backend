@@ -1,6 +1,6 @@
 [database]
 host = "localhost"
 port = "5432"
-username = "user"
+user = "user"
 password = "password"
-database = "database"
+name = "database"
