@@ -7,8 +7,6 @@ const CreateLinks = `
 		id bigserial PRIMARY KEY,
 		name text UNIQUE,
 		url text UNIQUE NOT NULL,
-		password text,
-		client_address inet NOT NULL,
 		created_at timestamp NOT NULL
 	);
 	
