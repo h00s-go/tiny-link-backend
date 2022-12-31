@@ -6,19 +6,24 @@ import (
 	"fmt"
 
 	"github.com/h00s-go/tiny-link-backend/config"
+	"github.com/h00s-go/tiny-link-backend/db/migrations"
 	"github.com/h00s-go/tiny-link-backend/db/sql"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Database struct {
-	config *config.Database
-	conn   *pgxpool.Pool
+	config     *config.Database
+	conn       *pgxpool.Pool
+	migrations map[int]string
 }
 
 func NewDatabase(config *config.Database) *Database {
 	return &Database{
 		config: config,
+		migrations: map[int]string{
+			1: migrations.CreateLinks,
+		},
 	}
 }
 
@@ -54,7 +59,7 @@ func (db *Database) Migrate() error {
 		return err
 	}
 
-	var version string
+	var version int
 	err := db.conn.QueryRow(context.Background(), sql.SelectSchema).Scan(&version)
 	if err != nil {
 		if err == pgx.ErrNoRows {
@@ -65,6 +70,12 @@ func (db *Database) Migrate() error {
 			return errors.New("Unable to scan row: " + err.Error())
 		}
 		return err
+	}
+
+	for i := version + 1; i <= len(db.migrations); i++ {
+		if _, err := db.conn.Exec(context.Background(), db.migrations[i]); err != nil {
+			return err
+		}
 	}
 
 	return nil
