@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/h00s-go/tiny-link-backend/api"
 	"github.com/h00s-go/tiny-link-backend/config"
@@ -27,7 +30,18 @@ func main() {
 
 	logger.Println("Starting server on :8080")
 	r := api.NewRouter()
-	if err := r.Start(":8080"); err != http.ErrServerClosed {
+	go func() {
+		if err := r.Start(":8080"); err != nil && err != http.ErrServerClosed {
+			logger.Fatal("Error starting server: " + err.Error())
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := r.Shutdown(ctx); err != nil {
 		logger.Fatal(err)
 	}
 }
