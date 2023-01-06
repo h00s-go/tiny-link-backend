@@ -1,16 +1,13 @@
 package api
 
 import (
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/render"
+	"github.com/labstack/echo/v4"
 )
 
-func (api *API) NewRouter() *chi.Mux {
-	r := chi.NewRouter()
+func (api *API) NewRouter() *echo.Echo {
+	e := echo.New()
 
-	r.Use(render.SetContentType(render.ContentTypeJSON))
+	e.GET("/api/v1/health", api.GetHealthHandler)
 
-	r.Get("/api/v1/health", api.GetHealthHandler)
-
-	return r
+	return e
 }
