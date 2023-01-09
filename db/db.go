@@ -69,7 +69,6 @@ func (db *Database) Migrate() error {
 		} else {
 			return errors.New("Unable to scan row: " + err.Error())
 		}
-		return err
 	}
 
 	for i := version + 1; i <= len(db.migrations); i++ {
