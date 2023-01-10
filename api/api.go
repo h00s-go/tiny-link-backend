@@ -8,7 +8,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/h00s-go/tiny-link-backend/api/controllers"
+	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/h00s-go/tiny-link-backend/config"
 	"github.com/h00s-go/tiny-link-backend/db"
 	"github.com/labstack/echo/v4"
@@ -17,14 +17,14 @@ import (
 type API struct {
 	config   *config.Config
 	server   *echo.Echo
-	services *controllers.Services
+	services *services.Services
 }
 
 func NewAPI(config *config.Config, db *db.Database, logger *log.Logger) *API {
 	return &API{
 		config: config,
 		server: echo.New(),
-		services: &controllers.Services{
+		services: &services.Services{
 			DB:     db,
 			Logger: logger,
 		},

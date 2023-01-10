@@ -14,7 +14,7 @@ import (
 
 type Database struct {
 	config     *config.Database
-	conn       *pgxpool.Pool
+	Conn       *pgxpool.Pool
 	migrations map[int]string
 }
 
@@ -32,16 +32,16 @@ func (db *Database) Connect() error {
 	if err != nil {
 		return errors.New("Unable to create connection pool: " + err.Error())
 	}
-	db.conn = conn
+	db.Conn = conn
 
-	if err := db.conn.Ping(context.Background()); err != nil {
+	if err := db.Conn.Ping(context.Background()); err != nil {
 		return errors.New("Unable to ping database: " + err.Error())
 	}
 	return nil
 }
 
 func (db *Database) Close() {
-	db.conn.Close()
+	db.Conn.Close()
 }
 
 func (db *Database) ConnString() string {
@@ -55,15 +55,15 @@ func (db *Database) ConnString() string {
 }
 
 func (db *Database) Migrate() error {
-	if _, err := db.conn.Exec(context.Background(), sql.CreateSchema); err != nil {
+	if _, err := db.Conn.Exec(context.Background(), sql.CreateSchema); err != nil {
 		return err
 	}
 
 	var version int
-	err := db.conn.QueryRow(context.Background(), sql.SelectSchema).Scan(&version)
+	err := db.Conn.QueryRow(context.Background(), sql.SelectSchema).Scan(&version)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			if _, err = db.conn.Exec(context.Background(), sql.InsertSchema); err != nil {
+			if _, err = db.Conn.Exec(context.Background(), sql.InsertSchema); err != nil {
 				return err
 			}
 		} else {
@@ -72,7 +72,7 @@ func (db *Database) Migrate() error {
 	}
 
 	for i := version + 1; i <= len(db.migrations); i++ {
-		if _, err := db.conn.Exec(context.Background(), db.migrations[i]); err != nil {
+		if _, err := db.Conn.Exec(context.Background(), db.migrations[i]); err != nil {
 			return err
 		}
 	}

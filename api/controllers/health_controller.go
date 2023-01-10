@@ -3,14 +3,15 @@ package controllers
 import (
 	"net/http"
 
+	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/labstack/echo/v4"
 )
 
 type HealthController struct {
-	services *Services
+	services *services.Services
 }
 
-func NewHealthController(services *Services) *HealthController {
+func NewHealthController(services *services.Services) *HealthController {
 	return &HealthController{
 		services: services,
 	}
