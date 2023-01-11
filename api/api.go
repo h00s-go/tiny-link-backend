@@ -18,12 +18,13 @@ type API struct {
 	services *services.Services
 }
 
-func NewAPI(config *config.Config, db *db.Database, logger *log.Logger) *API {
+func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
 	return &API{
 		config: config,
 		server: fiber.New(),
 		services: &services.Services{
-			DB:     db,
+			DB:     database,
+			IMDS:   memStore,
 			Logger: logger,
 		},
 	}

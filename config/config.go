@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	Database Database
+	MemStore MemStore
 }
 
 type Database struct {
@@ -18,6 +19,13 @@ type Database struct {
 	User     string
 	Password string
 	Name     string
+}
+
+type MemStore struct {
+	Host     string
+	Port     string
+	Password string
+	Database int
 }
 
 func NewConfig() *Config {
@@ -48,6 +56,11 @@ func (c *Config) applyEnvirontmentVariables() {
 	applyEnvirontmentVariable("DATABASE_USER", &c.Database.User)
 	applyEnvirontmentVariable("DATABASE_PASSWORD", &c.Database.Password)
 	applyEnvirontmentVariable("DATABASE_NAME", &c.Database.Name)
+
+	applyEnvirontmentVariable("MEMSTORE_HOST", &c.MemStore.Host)
+	applyEnvirontmentVariable("MEMSTORE_PORT", &c.MemStore.Port)
+	applyEnvirontmentVariable("MEMSTORE_PASSWORD", &c.MemStore.Password)
+	applyEnvirontmentVariable("MEMSTORE_DATABASE", &c.MemStore.Database)
 }
 
 func applyEnvirontmentVariable(key string, value interface{}) {

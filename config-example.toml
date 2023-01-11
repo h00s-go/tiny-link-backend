@@ -4,3 +4,9 @@ port = "5432"
 user = "user"
 password = "password"
 name = "database"
+
+[memstore]
+host = "localhost"
+port = "6379"
+password = "password"
+database = 0

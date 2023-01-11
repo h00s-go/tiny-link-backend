@@ -8,5 +8,6 @@ import (
 
 type Services struct {
 	DB     *db.Database
+	IMDS   *db.MemStore
 	Logger *log.Logger
 }

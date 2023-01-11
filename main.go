@@ -13,16 +13,22 @@ func main() {
 	config := config.NewConfig()
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-	db := db.NewDatabase(&config.Database)
-	if err := db.Connect(); err != nil {
+	database := db.NewDatabase(&config.Database)
+	if err := database.Connect(); err != nil {
 		logger.Fatal(err)
 	}
-	if err := db.Migrate(); err != nil {
+	if err := database.Migrate(); err != nil {
 		logger.Fatal(err)
 	}
-	defer db.Close()
+	defer database.Close()
 
-	api := api.NewAPI(config, db, logger)
+	memstore := db.NewMemStore(&config.MemStore)
+	if err := memstore.Connect(); err != nil {
+		logger.Fatal(err)
+	}
+	defer memstore.Close()
+
+	api := api.NewAPI(config, database, memstore, logger)
 	api.SetRoutes()
 	api.Start()
 	api.WaitForShutdown()
