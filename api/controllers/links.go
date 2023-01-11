@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/models"
 	"github.com/h00s-go/tiny-link-backend/api/services"
-	"github.com/labstack/echo/v4"
 )
 
 type LinksController struct {
@@ -16,10 +16,10 @@ func NewLinksController(services *services.Services) *LinksController {
 	}
 }
 
-func (l *LinksController) GetLinkHandler(c echo.Context) error {
-	link, err := models.GetLinkByID(l.services, c.Param("id"))
+func (l *LinksController) GetLinkHandler(c *fiber.Ctx) error {
+	link, err := models.GetLinkByID(l.services, c.Params("id"))
 	if err != nil {
-		return c.JSON(404, err)
+		return c.SendStatus(404)
 	}
-	return c.JSON(200, link)
+	return c.JSON(link)
 }

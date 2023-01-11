@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	"net/http"
-
+	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/services"
-	"github.com/labstack/echo/v4"
 )
 
 type HealthController struct {
@@ -17,9 +15,10 @@ func NewHealthController(services *services.Services) *HealthController {
 	}
 }
 
-func (h *HealthController) GetHealthHandler(c echo.Context) error {
+func (h *HealthController) GetHealthHandler(c *fiber.Ctx) error {
 	h.services.Logger.Println("Health check")
-	return c.JSON(http.StatusOK, map[string]string{
+	return c.JSON(fiber.Map{
 		"status": "OK",
+		"age":    20,
 	})
 }
