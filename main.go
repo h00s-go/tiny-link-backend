@@ -29,7 +29,6 @@ func main() {
 	defer memstore.Close()
 
 	api := api.NewAPI(config, database, memstore, logger)
-	api.SetRoutes()
 	api.Start()
 	api.WaitForShutdown()
 }

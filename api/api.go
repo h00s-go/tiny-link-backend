@@ -32,6 +32,7 @@ func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore,
 
 func (api *API) Start() {
 	api.services.Logger.Println("Starting server on :8080")
+	api.SetRoutes()
 	go func() {
 		if err := api.server.Listen(":8080"); err != nil && err != http.ErrServerClosed {
 			api.services.Logger.Fatal("Error starting server: " + err.Error())
