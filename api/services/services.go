@@ -11,3 +11,11 @@ type Services struct {
 	IMDS   *db.MemStore
 	Logger *log.Logger
 }
+
+func NewServices(db *db.Database, imds *db.MemStore, logger *log.Logger) *Services {
+	return &Services{
+		DB:     db,
+		IMDS:   imds,
+		Logger: logger,
+	}
+}

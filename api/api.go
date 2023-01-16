@@ -22,11 +22,11 @@ func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore,
 	return &API{
 		config: config,
 		server: fiber.New(),
-		services: &services.Services{
-			DB:     database,
-			IMDS:   memStore,
-			Logger: logger,
-		},
+		services: services.NewServices(
+			database,
+			memStore,
+			logger,
+		),
 	}
 }
 
