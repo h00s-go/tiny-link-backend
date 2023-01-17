@@ -19,6 +19,5 @@ func (h *HealthController) GetHealthHandler(c *fiber.Ctx) error {
 	h.services.Logger.Println("Health check")
 	return c.JSON(fiber.Map{
 		"status": "OK",
-		"age":    20,
 	})
 }
