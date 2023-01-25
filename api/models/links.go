@@ -24,3 +24,13 @@ func GetLinkByID(s *services.Services, id string) (*Link, error) {
 
 	return l, nil
 }
+
+func GetLinkByShortURI(s *services.Services, shortURI string) (*Link, error) {
+	l := &Link{}
+
+	if err := s.DB.Conn.QueryRow(context.Background(), sql.GetLinkByShortURI, shortURI).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
+		return nil, err
+	}
+
+	return l, nil
+}

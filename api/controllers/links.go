@@ -16,8 +16,8 @@ func NewLinksController(services *services.Services) *LinksController {
 	}
 }
 
-func (l *LinksController) GetLinkHandler(c *fiber.Ctx) error {
-	link, err := models.GetLinkByID(l.services, c.Params("id"))
+func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
+	link, err := models.GetLinkByShortURI(l.services, c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
 	}

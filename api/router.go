@@ -7,5 +7,6 @@ func (api *API) setRoutes() {
 	linksController := controllers.NewLinksController(api.services)
 
 	api.server.Get("/api/v1/health", healthController.GetHealthHandler)
-	api.server.Get("/api/v1/links/:id", linksController.GetLinkHandler)
+	//api.server.Get("/api/v1/links/:id", linksController.GetLinkHandler)
+	api.server.Get("/api/v1/links/:short_uri", linksController.GetLinkByShortURIHandler)
 }
