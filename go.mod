@@ -7,6 +7,7 @@ require (
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/gofiber/fiber/v2 v2.41.0
 	github.com/jackc/pgx/v5 v5.2.0
+	golang.org/x/net v0.5.0
 )
 
 require (
@@ -28,5 +29,5 @@ require (
 	golang.org/x/crypto v0.2.0 // indirect
 	golang.org/x/sync v0.0.0-20220923202941-7f9b1623fab7 // indirect
 	golang.org/x/sys v0.4.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
 )

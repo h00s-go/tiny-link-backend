@@ -23,3 +23,21 @@ func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
 	}
 	return c.JSON(link)
 }
+
+func (l *LinksController) CreateLinkHandler(c *fiber.Ctx) error {
+	link := &models.Link{}
+	if err := c.BodyParser(link); err != nil {
+		return c.SendStatus(400)
+	}
+
+	h := models.NewHost(link.URL)
+	if err := h.IsValid(); err != nil {
+		c.JSON(fiber.Map{"error": err.Error()})
+		return c.SendStatus(400)
+	}
+
+	//if err := link.Create(l.services); err != nil {
+	//	return c.SendStatus(500)
+	//}
+	return c.JSON(link)
+}
