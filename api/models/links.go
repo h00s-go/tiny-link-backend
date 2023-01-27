@@ -45,11 +45,12 @@ func GetLinkByShortURI(s *services.Services, shortURI string) (*Link, error) {
 	}
 
 	link, err := json.Marshal(l)
-	if err != nil {
+	if err == nil {
+		if err := s.IMDS.Client.Set(context.Background(), shortURI, link, 0).Err(); err != nil {
+			s.Logger.Println("Error while setting key to memstore: ", err)
+		}
+	} else {
 		s.Logger.Println("Error while marshaling link: ", err)
-	}
-	if err := s.IMDS.Client.Set(context.Background(), shortURI, link, 0).Err(); err != nil {
-		s.Logger.Println("Error while setting key to memstore: ", err)
 	}
 
 	return l, nil
