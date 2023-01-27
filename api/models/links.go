@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/go-redis/redis/v9"
@@ -30,18 +31,24 @@ func GetLinkByShortURI(s *services.Services, shortURI string) (*Link, error) {
 	l := &Link{}
 
 	value, err := s.IMDS.Client.Get(context.Background(), shortURI).Result()
-	if err != nil && err != redis.Nil {
-		s.Logger.Println("Error while getting key from memstore: ", err)
-	} else {
-		l.URL = value
+	if err == nil {
+		if err := json.Unmarshal([]byte(value), &l); err != nil {
+			s.Logger.Println("Error while unmarshaling link: ", err)
+		}
 		return l, nil
+	} else if err != redis.Nil {
+		s.Logger.Println("Error while getting key from memstore: ", err)
 	}
 
 	if err := s.DB.Conn.QueryRow(context.Background(), sql.GetLinkByShortURI, shortURI).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
-	if err := s.IMDS.Client.Set(context.Background(), shortURI, l.URL, 0).Err(); err != nil {
+	link, err := json.Marshal(l)
+	if err != nil {
+		s.Logger.Println("Error while marshaling link: ", err)
+	}
+	if err := s.IMDS.Client.Set(context.Background(), shortURI, link, 0).Err(); err != nil {
 		s.Logger.Println("Error while setting key to memstore: ", err)
 	}
 
