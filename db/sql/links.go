@@ -12,6 +12,12 @@ const GetLinkByShortURI = `
 	WHERE short_uri = $1
 `
 
+const GetLinkByURL = `
+	SELECT id, short_uri, url, created_at
+	FROM links
+	WHERE url = $1
+`
+
 const CreateLink = `
 	INSERT INTO links (
 		url, created_at

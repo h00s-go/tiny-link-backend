@@ -27,14 +27,17 @@ func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
 
 func (l *LinksController) CreateLinkHandler(c *fiber.Ctx) error {
 	links := models.NewLinks(l.services)
-	link := &models.Link{}
+	link := new(models.Link)
 	if err := c.BodyParser(link); err != nil {
 		return c.SendStatus(400)
 	}
 
 	var err error
 	if link, err = links.Create(link.URL); err != nil {
+		l.services.Logger.Println("Error creating link: ", err)
 		return c.SendStatus(500)
+	} else {
+		c.JSON(link)
+		return c.SendStatus(201)
 	}
-	return c.JSON(link)
 }

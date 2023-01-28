@@ -43,8 +43,23 @@ func (ls *Links) FindByShortURI(shortURI string) (*Link, error) {
 	return l, nil
 }
 
-func (ls *Links) Create(URL string) (*Link, error) {
+func (ls *Links) FindByURL(URL string) (*Link, error) {
 	if l := ls.findInMemstoreByURL(URL); l != nil {
+		return l, nil
+	}
+
+	l := &Link{}
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
+		return nil, err
+	}
+
+	go ls.createInMemstore(l)
+
+	return l, nil
+}
+
+func (ls *Links) Create(URL string) (*Link, error) {
+	if l, err := ls.FindByURL(URL); err == nil {
 		return l, nil
 	}
 
@@ -73,8 +88,6 @@ func (ls *Links) Create(URL string) (*Link, error) {
 	if err := tx.Commit(context.Background()); err != nil {
 		return nil, err
 	}
-
-	//go ls.CreateInMemstore(l)
 
 	return l, nil
 }
