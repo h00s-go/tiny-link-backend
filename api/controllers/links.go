@@ -32,7 +32,8 @@ func (l *LinksController) CreateLinkHandler(c *fiber.Ctx) error {
 		return c.SendStatus(400)
 	}
 
-	if err := links.Create(link); err != nil {
+	var err error
+	if link, err = links.Create(link.URL); err != nil {
 		return c.SendStatus(500)
 	}
 	return c.JSON(link)

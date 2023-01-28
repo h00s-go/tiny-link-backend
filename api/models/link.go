@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Link struct {
 	ID        int64     `json:"id"`
@@ -18,4 +21,12 @@ func (l *Link) GenerateShortName() {
 		id = id / int64(len(validChars))
 	}
 	l.ShortURI = uri
+}
+
+func (l *Link) Marshal() ([]byte, error) {
+	return json.Marshal(l)
+}
+
+func (l *Link) Unmarshal(data []byte) error {
+	return json.Unmarshal(data, l)
 }
