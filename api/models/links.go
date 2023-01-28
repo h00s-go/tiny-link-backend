@@ -29,7 +29,7 @@ func (ls *Links) FindByID(id string) (*Link, error) {
 }
 
 func (ls *Links) FindByShortURI(shortURI string) (*Link, error) {
-	if l := ls.FindInMemstoreByShortURI(shortURI); l != nil {
+	if l := ls.findInMemstoreByShortURI(shortURI); l != nil {
 		return l, nil
 	}
 
@@ -38,62 +38,13 @@ func (ls *Links) FindByShortURI(shortURI string) (*Link, error) {
 		return nil, err
 	}
 
-	go ls.CreateInMemstore(l)
+	go ls.createInMemstore(l)
 
 	return l, nil
 }
 
-func (ls *Links) FindInMemstoreByShortURI(shortURI string) *Link {
-	l := &Link{}
-
-	value, err := ls.services.IMDS.Client.Get(context.Background(), "short_uri:"+shortURI).Result()
-	if err == nil {
-		if err != redis.Nil {
-			if l.Unmarshal([]byte(value)) != nil {
-				ls.services.Logger.Println("Error while unmarshaling link: ", err)
-				return nil
-			}
-			return l
-		}
-	} else {
-		ls.services.Logger.Println("Error while getting key from memstore: ", err)
-	}
-
-	return nil
-}
-
-func (ls *Links) FindInMemstoreByURL(url string) *Link {
-	if shortURI := ls.FindShortURIInMemstoreByURL(url); shortURI != nil {
-		return ls.FindInMemstoreByShortURI(*shortURI)
-	}
-	return nil
-}
-
-func (ls *Links) FindShortURIInMemstoreByURL(url string) *string {
-	shortURI, err := ls.services.IMDS.Client.Get(context.Background(), "url:"+url).Result()
-	if err == nil {
-		return &shortURI
-	} else if err != redis.Nil {
-		ls.services.Logger.Println("Error while getting key from memstore: ", err)
-	}
-	return nil
-}
-
-func (ls *Links) CreateInMemstore(l *Link) {
-	if link, err := l.Marshal(); err == nil {
-		pipe := ls.services.IMDS.Client.TxPipeline()
-		pipe.Set(context.Background(), "short_uri:"+l.ShortURI, link, 0)
-		pipe.Set(context.Background(), "url:"+string(l.URL), l.ShortURI, 0)
-		if _, err := pipe.Exec(context.Background()); err != nil {
-			ls.services.Logger.Println("Error while setting link in memstore: ", err)
-		}
-	} else {
-		ls.services.Logger.Println("Error while marshaling link: ", err)
-	}
-}
-
 func (ls *Links) Create(URL string) (*Link, error) {
-	if l := ls.FindInMemstoreByURL(URL); l != nil {
+	if l := ls.findInMemstoreByURL(URL); l != nil {
 		return l, nil
 	}
 
@@ -123,7 +74,49 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	go ls.CreateInMemstore(l)
+	//go ls.CreateInMemstore(l)
 
 	return l, nil
+}
+
+// ++++++ Memstore ++++++
+
+func (ls *Links) findInMemstoreByShortURI(shortURI string) *Link {
+	l := &Link{}
+
+	value, err := ls.services.IMDS.Client.Get(context.Background(), "short_uri:"+shortURI).Result()
+	if err == nil {
+		if l.Unmarshal([]byte(value)) != nil {
+			ls.services.Logger.Println("Error while unmarshaling link: ", err)
+			return nil
+		}
+		return l
+	} else if err != redis.Nil {
+		ls.services.Logger.Println("Error while getting key from memstore: ", err)
+	}
+
+	return nil
+}
+
+func (ls *Links) findInMemstoreByURL(url string) *Link {
+	shortURI, err := ls.services.IMDS.Client.Get(context.Background(), "url:"+url).Result()
+	if err == nil {
+		return ls.findInMemstoreByShortURI(shortURI)
+	} else if err != redis.Nil {
+		ls.services.Logger.Println("Error while getting key from memstore: ", err)
+	}
+	return nil
+}
+
+func (ls *Links) createInMemstore(l *Link) {
+	if link, err := l.Marshal(); err == nil {
+		pipe := ls.services.IMDS.Client.TxPipeline()
+		pipe.Set(context.Background(), "short_uri:"+l.ShortURI, link, 0)
+		pipe.Set(context.Background(), "url:"+string(l.URL), l.ShortURI, 0)
+		if _, err := pipe.Exec(context.Background()); err != nil {
+			ls.services.Logger.Println("Error while setting link in memstore: ", err)
+		}
+	} else {
+		ls.services.Logger.Println("Error while marshaling link: ", err)
+	}
 }
