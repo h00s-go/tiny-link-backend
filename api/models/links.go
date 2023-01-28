@@ -78,7 +78,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		tx.Rollback(context.Background())
 		return nil, err
 	}
-	l.GenerateShortName()
+	l.GenerateShortURI()
 
 	if _, err := tx.Exec(context.Background(), sql.UpdateLinkShortURI, l.ShortURI, l.ID); err != nil {
 		tx.Rollback(context.Background())

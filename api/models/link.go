@@ -12,7 +12,7 @@ type Link struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (l *Link) GenerateShortName() {
+func (l *Link) GenerateShortURI() {
 	const validChars = "ABCDEFHJKLMNPRSTUVXYZabcdefgijkmnprstuvxyz23456789"
 	uri := ""
 	id := l.ID
