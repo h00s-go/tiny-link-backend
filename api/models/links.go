@@ -89,7 +89,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	return l, nil
+	return ls.FindByShortURI(l.ShortURI)
 }
 
 // ++++++ Memstore ++++++
