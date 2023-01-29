@@ -6,14 +6,7 @@ import (
 	"github.com/h00s-go/tiny-link-backend/api/services"
 )
 
-type LinksController struct {
-}
-
-func NewLinksController() *LinksController {
-	return &LinksController{}
-}
-
-func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
+func GetLinkByShortURIHandler(c *fiber.Ctx) error {
 	links := models.NewLinks(services.GetServices(c))
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
@@ -22,7 +15,7 @@ func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
 	return c.JSON(link)
 }
 
-func (l LinksController) CreateLinkHandler(c *fiber.Ctx) error {
+func CreateLinkHandler(c *fiber.Ctx) error {
 	s := services.GetServices(c)
 	links := models.NewLinks(s)
 	link := new(models.Link)
