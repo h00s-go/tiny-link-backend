@@ -18,9 +18,6 @@ type API struct {
 	services *services.Services
 }
 
-func Pero() {
-}
-
 func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
 	server := fiber.New()
 	services := services.NewServices(database, memStore, logger)
