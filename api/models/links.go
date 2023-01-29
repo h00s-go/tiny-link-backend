@@ -3,9 +3,9 @@ package models
 import (
 	"context"
 
-	"github.com/go-redis/redis/v9"
 	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/h00s-go/tiny-link-backend/db/sql"
+	"github.com/redis/go-redis/v9"
 )
 
 type Links struct {

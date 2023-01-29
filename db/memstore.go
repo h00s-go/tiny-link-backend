@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/go-redis/redis/v9"
 	"github.com/h00s-go/tiny-link-backend/config"
+	"github.com/redis/go-redis/v9"
 )
 
 type MemStore struct {
