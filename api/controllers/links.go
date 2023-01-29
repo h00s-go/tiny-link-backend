@@ -7,17 +7,14 @@ import (
 )
 
 type LinksController struct {
-	services *services.Services
 }
 
-func NewLinksController(services *services.Services) *LinksController {
-	return &LinksController{
-		services: services,
-	}
+func NewLinksController() *LinksController {
+	return &LinksController{}
 }
 
 func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
-	links := models.NewLinks(l.services)
+	links := models.NewLinks(services.GetServices(c))
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
@@ -25,8 +22,9 @@ func (l *LinksController) GetLinkByShortURIHandler(c *fiber.Ctx) error {
 	return c.JSON(link)
 }
 
-func (l *LinksController) CreateLinkHandler(c *fiber.Ctx) error {
-	links := models.NewLinks(l.services)
+func (l LinksController) CreateLinkHandler(c *fiber.Ctx) error {
+	s := services.GetServices(c)
+	links := models.NewLinks(s)
 	link := new(models.Link)
 	if err := c.BodyParser(link); err != nil {
 		return c.SendStatus(400)
@@ -34,7 +32,7 @@ func (l *LinksController) CreateLinkHandler(c *fiber.Ctx) error {
 
 	var err error
 	if link, err = links.Create(link.URL); err != nil {
-		l.services.Logger.Println("Error creating link: ", err)
+		s.Logger.Println("Error creating link: ", err)
 		return c.SendStatus(500)
 	} else {
 		c.JSON(link)

@@ -18,15 +18,19 @@ type API struct {
 	services *services.Services
 }
 
+func Pero() {
+}
+
 func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
+	server := fiber.New()
+	services := services.NewServices(database, memStore, logger)
+
+	server.Use(services.ServicesMiddleware)
+
 	return &API{
-		config: config,
-		server: fiber.New(),
-		services: services.NewServices(
-			database,
-			memStore,
-			logger,
-		),
+		config:   config,
+		server:   server,
+		services: services,
 	}
 }
 

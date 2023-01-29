@@ -3,8 +3,8 @@ package api
 import "github.com/h00s-go/tiny-link-backend/api/controllers"
 
 func (api *API) setRoutes() {
-	healthController := controllers.NewHealthController(api.services)
-	linksController := controllers.NewLinksController(api.services)
+	healthController := controllers.NewHealthController()
+	linksController := controllers.NewLinksController()
 
 	api.server.Get("/api/v1/health", healthController.GetHealthHandler)
 	//api.server.Get("/api/v1/links/:id", linksController.GetLinkHandler)
