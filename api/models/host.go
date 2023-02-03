@@ -71,6 +71,8 @@ func isWhitelisted(domain string) bool {
 func isRedirector(domain string) bool {
 	switch domain {
 	case
+		"skrati.link",
+		"tnylnk.in",
 		"adf.ly",
 		"bc.vc",
 		"bit.do",
