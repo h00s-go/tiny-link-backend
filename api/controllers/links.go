@@ -15,6 +15,15 @@ func GetLinkByShortURIHandler(c *fiber.Ctx) error {
 	return c.JSON(link)
 }
 
+func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
+	links := models.NewLinks(services.GetServices(c))
+	link, err := links.FindByShortURI(c.Params("short_uri"))
+	if err != nil {
+		return c.SendStatus(404)
+	}
+	return c.Redirect(link.URL, 301)
+}
+
 func CreateLinkHandler(c *fiber.Ctx) error {
 	s := services.GetServices(c)
 	links := models.NewLinks(s)
