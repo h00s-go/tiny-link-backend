@@ -7,6 +7,7 @@ import (
 	"os/signal"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/h00s-go/tiny-link-backend/api/models"
 	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/h00s-go/tiny-link-backend/config"
 	"github.com/h00s-go/tiny-link-backend/db"
@@ -16,18 +17,22 @@ type API struct {
 	config   *config.Config
 	server   *fiber.App
 	services *services.Services
+	models   *models.Models
 }
 
 func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
 	server := fiber.New()
 	services := services.NewServices(database, memStore, logger)
+	models := models.NewModels(services)
 
 	server.Use(services.ServicesMiddleware)
+	server.Use(models.ModelsMiddleware)
 
 	return &API{
 		config:   config,
 		server:   server,
 		services: services,
+		models:   models,
 	}
 }
 

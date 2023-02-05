@@ -7,7 +7,7 @@ import (
 )
 
 func GetLinkByShortURIHandler(c *fiber.Ctx) error {
-	links := models.NewLinks(services.GetServices(c))
+	links := models.GetModels(c).Links
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
@@ -16,7 +16,7 @@ func GetLinkByShortURIHandler(c *fiber.Ctx) error {
 }
 
 func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
-	links := models.NewLinks(services.GetServices(c))
+	links := models.GetModels(c).Links
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
@@ -25,8 +25,7 @@ func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
 }
 
 func CreateLinkHandler(c *fiber.Ctx) error {
-	s := services.GetServices(c)
-	links := models.NewLinks(s)
+	links := models.GetModels(c).Links
 	link := new(models.Link)
 	if err := c.BodyParser(link); err != nil {
 		return c.SendStatus(400)
@@ -34,7 +33,7 @@ func CreateLinkHandler(c *fiber.Ctx) error {
 
 	var err error
 	if link, err = links.Create(link.URL); err != nil {
-		s.Logger.Println("Error creating link: ", err)
+		services.GetServices(c).Logger.Println("Error creating link: ", err)
 		return c.SendStatus(500)
 	} else {
 		c.JSON(link)
