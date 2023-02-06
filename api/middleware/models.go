@@ -6,21 +6,21 @@ import (
 	"github.com/h00s-go/tiny-link-backend/services"
 )
 
-type Models struct {
+type ModelsMiddleware struct {
 	Links *models.Links
 }
 
-func NewModels(services *services.Services) *Models {
-	return &Models{
+func NewModelsMiddleware(services *services.Services) *ModelsMiddleware {
+	return &ModelsMiddleware{
 		Links: models.NewLinks(services),
 	}
 }
 
-func (m *Models) ModelsMiddleware(c *fiber.Ctx) error {
+func (m *ModelsMiddleware) ModelsMiddleware(c *fiber.Ctx) error {
 	c.Locals("models", m)
 	return c.Next()
 }
 
-func GetModels(c *fiber.Ctx) *Models {
-	return c.Locals("models").(*Models)
+func GetModels(c *fiber.Ctx) *ModelsMiddleware {
+	return c.Locals("models").(*ModelsMiddleware)
 }

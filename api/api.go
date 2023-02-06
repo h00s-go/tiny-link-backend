@@ -17,22 +17,21 @@ type API struct {
 	config   *config.Config
 	server   *fiber.App
 	services *services.Services
-	models   *middleware.Models
 }
 
 func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
 	server := fiber.New()
 	services := services.NewServices(database, memStore, logger)
-	models := middleware.NewModels(services)
+	servicesMiddleware := middleware.NewServicesMiddleware(services)
+	modelsMiddleware := middleware.NewModelsMiddleware(services)
 
-	server.Use(services.ServicesMiddleware)
-	server.Use(models.ModelsMiddleware)
+	server.Use(servicesMiddleware.ServicesMiddleware)
+	server.Use(modelsMiddleware.ModelsMiddleware)
 
 	return &API{
 		config:   config,
 		server:   server,
 		services: services,
-		models:   models,
 	}
 }
 
