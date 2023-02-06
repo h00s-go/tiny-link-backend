@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/h00s-go/tiny-link-backend/api/middleware"
 	"github.com/h00s-go/tiny-link-backend/api/models"
 	"github.com/h00s-go/tiny-link-backend/api/services"
 )
 
 func GetLinkByShortURIHandler(c *fiber.Ctx) error {
-	links := models.GetModels(c).Links
+	links := middleware.GetModels(c).Links
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
@@ -16,7 +17,7 @@ func GetLinkByShortURIHandler(c *fiber.Ctx) error {
 }
 
 func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
-	links := models.GetModels(c).Links
+	links := middleware.GetModels(c).Links
 	link, err := links.FindByShortURI(c.Params("short_uri"))
 	if err != nil {
 		return c.SendStatus(404)
@@ -25,7 +26,7 @@ func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
 }
 
 func CreateLinkHandler(c *fiber.Ctx) error {
-	links := models.GetModels(c).Links
+	links := middleware.GetModels(c).Links
 	link := new(models.Link)
 	if err := c.BodyParser(link); err != nil {
 		return c.SendStatus(400)

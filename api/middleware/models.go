@@ -1,17 +1,18 @@
-package models
+package middleware
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/h00s-go/tiny-link-backend/api/models"
 	"github.com/h00s-go/tiny-link-backend/api/services"
 )
 
 type Models struct {
-	Links *Links
+	Links *models.Links
 }
 
 func NewModels(services *services.Services) *Models {
 	return &Models{
-		Links: NewLinks(services),
+		Links: models.NewLinks(services),
 	}
 }
 
