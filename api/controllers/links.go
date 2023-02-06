@@ -4,7 +4,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/middleware"
 	"github.com/h00s-go/tiny-link-backend/api/models"
-	"github.com/h00s-go/tiny-link-backend/services"
 )
 
 func GetLinkByShortURIHandler(c *fiber.Ctx) error {
@@ -34,7 +33,7 @@ func CreateLinkHandler(c *fiber.Ctx) error {
 
 	var err error
 	if link, err = links.Create(link.URL); err != nil {
-		services.GetServices(c).Logger.Println("Error creating link: ", err)
+		middleware.GetServices(c).Logger.Println("Error creating link: ", err)
 		return c.SendStatus(500)
 	} else {
 		c.JSON(link)

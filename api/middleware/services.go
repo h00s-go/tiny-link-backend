@@ -19,3 +19,7 @@ func (sm *ServicesMiddleware) ServicesMiddleware(c *fiber.Ctx) error {
 	c.Locals("services", sm.Services)
 	return c.Next()
 }
+
+func GetServices(c *fiber.Ctx) *services.Services {
+	return c.Locals("services").(*services.Services)
+}
