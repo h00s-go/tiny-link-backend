@@ -6,10 +6,12 @@ import (
 )
 
 type Link struct {
-	ID        int64     `json:"id"`
-	ShortURI  string    `json:"short_uri"`
-	URL       string    `json:"url"`
-	CreatedAt time.Time `json:"created_at"`
+	ID             int64     `json:"id"`
+	ShortURI       string    `json:"short_uri"`
+	URL            string    `json:"url"`
+	CreatedAt      time.Time `json:"created_at"`
+	LastAccessedAt time.Time `json:"last_accessed_at"`
+	AccessCount    int64     `json:"access_count"`
 }
 
 func (l *Link) GenerateShortURI() {
