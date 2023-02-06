@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/h00s-go/tiny-link-backend/api/services"
+	"github.com/h00s-go/tiny-link-backend/services"
 )
 
 func GetHealthHandler(c *fiber.Ctx) error {

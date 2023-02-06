@@ -4,7 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/middleware"
 	"github.com/h00s-go/tiny-link-backend/api/models"
-	"github.com/h00s-go/tiny-link-backend/api/services"
+	"github.com/h00s-go/tiny-link-backend/services"
 )
 
 func GetLinkByShortURIHandler(c *fiber.Ctx) error {

@@ -3,8 +3,8 @@ package models
 import (
 	"context"
 
-	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/h00s-go/tiny-link-backend/db/sql"
+	"github.com/h00s-go/tiny-link-backend/services"
 	"github.com/redis/go-redis/v9"
 )
 

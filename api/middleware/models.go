@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/models"
-	"github.com/h00s-go/tiny-link-backend/api/services"
+	"github.com/h00s-go/tiny-link-backend/services"
 )
 
 type Models struct {

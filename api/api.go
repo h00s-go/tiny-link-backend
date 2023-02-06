@@ -8,9 +8,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/middleware"
-	"github.com/h00s-go/tiny-link-backend/api/services"
 	"github.com/h00s-go/tiny-link-backend/config"
 	"github.com/h00s-go/tiny-link-backend/db"
+	"github.com/h00s-go/tiny-link-backend/services"
 )
 
 type API struct {
