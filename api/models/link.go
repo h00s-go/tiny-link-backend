@@ -13,7 +13,7 @@ type Link struct {
 }
 
 func (l *Link) GenerateShortURI() {
-	const validChars = "ABCDEFHJKLMNPRSTUVXYZabcdefgijkmnprstuvxyz23456789"
+	const validChars = "bcdfghlmnprstvz23456789"
 	uri := ""
 	id := l.ID
 	for id > 0 {
