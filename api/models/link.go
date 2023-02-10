@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"strings"
 	"time"
 )
@@ -8,15 +9,23 @@ import (
 const ValidChars = "bcdfghmnprstvz23456789"
 
 type Link struct {
-	id        int64
+	ID        int64     `json:"-"`
 	ShortURI  string    `json:"short_uri"`
 	URL       string    `json:"url"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (l *Link) Update() *Link {
-	l.ShortURI = ShortURIfromID(l.id)
-	return l
+type AliasLink Link
+type PublicLink struct {
+	ShortURI string `json:"short_uri"`
+	*AliasLink
+}
+
+func (link *Link) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&PublicLink{
+		ShortURI:  ShortURIfromID(link.ID),
+		AliasLink: (*AliasLink)(link),
+	})
 }
 
 func ShortURIfromID(id int64) string {

@@ -31,7 +31,7 @@ func (ls *Links) FindByID(id int64) (*Link, error) {
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.id, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.ID, &l.URL, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +46,7 @@ func (ls *Links) FindByURL(URL string) (*Link, error) {
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.id, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.ID, &l.URL, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -71,7 +71,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL).Scan(&l.id); err != nil {
+	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL).Scan(&l.ID); err != nil {
 		tx.Rollback(context.Background())
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	return ls.FindByID(l.id)
+	return ls.FindByID(l.ID)
 }
 
 // ++++++ Memstore ++++++
@@ -120,8 +120,8 @@ func (ls *Links) findInMemstoreByURL(url string) *Link {
 func (ls *Links) createInMemstore(l *Link) {
 	if link, err := json.Marshal(l); err == nil {
 		pipe := ls.services.IMDS.Client.TxPipeline()
-		pipe.Set(context.Background(), "id:"+fmt.Sprint(l.id), link, 0)
-		pipe.Set(context.Background(), "url:"+l.URL, l.id, 0)
+		pipe.Set(context.Background(), "id:"+fmt.Sprint(l.ID), link, 0)
+		pipe.Set(context.Background(), "url:"+l.URL, l.ID, 0)
 		if _, err := pipe.Exec(context.Background()); err != nil {
 			ls.services.Logger.Println("Error while setting link in memstore: ", err)
 		}
