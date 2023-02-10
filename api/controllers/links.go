@@ -31,12 +31,11 @@ func CreateLinkHandler(c *fiber.Ctx) error {
 		return c.SendStatus(400)
 	}
 
-	var err error
-	if link, err = links.Create(link.URL); err != nil {
+	if link, err := links.Create(link.URL); err == nil {
+		c.JSON(link.Update())
+		return c.SendStatus(201)
+	} else {
 		middleware.GetServices(c).Logger.Println("Error creating link: ", err)
 		return c.SendStatus(500)
-	} else {
-		c.JSON(link)
-		return c.SendStatus(201)
 	}
 }

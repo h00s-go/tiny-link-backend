@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -34,7 +35,6 @@ func (ls *Links) FindByID(id int64) (*Link, error) {
 		return nil, err
 	}
 
-	l.SetShortURI()
 	go ls.createInMemstore(l)
 
 	return l, nil
@@ -50,7 +50,6 @@ func (ls *Links) FindByURL(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	l.SetShortURI()
 	go ls.createInMemstore(l)
 
 	return l, nil
@@ -91,7 +90,7 @@ func (ls *Links) findInMemstoreByID(id int64) *Link {
 
 	value, err := ls.services.IMDS.Client.Get(context.Background(), "id:"+fmt.Sprint(id)).Result()
 	if err == nil {
-		if l.Unmarshal([]byte(value)) != nil {
+		if json.Unmarshal([]byte(value), &l) != nil {
 			ls.services.Logger.Println("Error while unmarshaling link: ", err)
 			return nil
 		}
@@ -119,7 +118,7 @@ func (ls *Links) findInMemstoreByURL(url string) *Link {
 }
 
 func (ls *Links) createInMemstore(l *Link) {
-	if link, err := l.Marshal(); err == nil {
+	if link, err := json.Marshal(l); err == nil {
 		pipe := ls.services.IMDS.Client.TxPipeline()
 		pipe.Set(context.Background(), "id:"+fmt.Sprint(l.id), link, 0)
 		pipe.Set(context.Background(), "url:"+l.URL, l.id, 0)

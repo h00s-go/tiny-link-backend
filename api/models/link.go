@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 )
@@ -15,16 +14,9 @@ type Link struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func (l *Link) SetShortURI() {
+func (l *Link) Update() *Link {
 	l.ShortURI = ShortURIfromID(l.id)
-}
-
-func (l *Link) Marshal() ([]byte, error) {
-	return json.Marshal(l)
-}
-
-func (l *Link) Unmarshal(data []byte) error {
-	return json.Unmarshal(data, l)
+	return l
 }
 
 func ShortURIfromID(id int64) string {
