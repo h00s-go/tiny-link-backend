@@ -2,6 +2,8 @@ package models
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/h00s-go/tiny-link-backend/db/sql"
 	"github.com/h00s-go/tiny-link-backend/services"
@@ -18,26 +20,21 @@ func NewLinks(services *services.Services) *Links {
 	}
 }
 
-func (ls *Links) FindByID(id string) (*Link, error) {
-	l := &Link{}
-
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
-		return nil, err
-	}
-
-	return l, nil
+func (ls *Links) FindByShortURI(shortURI string) (*Link, error) {
+	return ls.FindByID(IDfromShortURI(shortURI))
 }
 
-func (ls *Links) FindByShortURI(shortURI string) (*Link, error) {
-	if l := ls.findInMemstoreByShortURI(shortURI); l != nil {
+func (ls *Links) FindByID(id int64) (*Link, error) {
+	if l := ls.findInMemstoreByID(id); l != nil {
 		return l, nil
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByShortURI, shortURI).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.id, &l.URL, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
+	l.SetShortURI()
 	go ls.createInMemstore(l)
 
 	return l, nil
@@ -49,10 +46,11 @@ func (ls *Links) FindByURL(URL string) (*Link, error) {
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.ID, &l.ShortURI, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.id, &l.URL, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
+	l.SetShortURI()
 	go ls.createInMemstore(l)
 
 	return l, nil
@@ -74,13 +72,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL).Scan(&l.ID); err != nil {
-		tx.Rollback(context.Background())
-		return nil, err
-	}
-	l.GenerateShortURI()
-
-	if _, err := tx.Exec(context.Background(), sql.UpdateLinkShortURI, l.ShortURI, l.ID); err != nil {
+	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL).Scan(&l.id); err != nil {
 		tx.Rollback(context.Background())
 		return nil, err
 	}
@@ -89,15 +81,15 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	return ls.FindByShortURI(l.ShortURI)
+	return ls.FindByID(l.id)
 }
 
 // ++++++ Memstore ++++++
 
-func (ls *Links) findInMemstoreByShortURI(shortURI string) *Link {
+func (ls *Links) findInMemstoreByID(id int64) *Link {
 	l := &Link{}
 
-	value, err := ls.services.IMDS.Client.Get(context.Background(), "short_uri:"+shortURI).Result()
+	value, err := ls.services.IMDS.Client.Get(context.Background(), "id:"+fmt.Sprint(id)).Result()
 	if err == nil {
 		if l.Unmarshal([]byte(value)) != nil {
 			ls.services.Logger.Println("Error while unmarshaling link: ", err)
@@ -112,9 +104,14 @@ func (ls *Links) findInMemstoreByShortURI(shortURI string) *Link {
 }
 
 func (ls *Links) findInMemstoreByURL(url string) *Link {
-	shortURI, err := ls.services.IMDS.Client.Get(context.Background(), "url:"+url).Result()
+	value, err := ls.services.IMDS.Client.Get(context.Background(), "url:"+url).Result()
 	if err == nil {
-		return ls.findInMemstoreByShortURI(shortURI)
+		id, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			ls.services.Logger.Println("Error converting string to int64:", err)
+			return nil
+		}
+		return ls.findInMemstoreByID(int64(id))
 	} else if err != redis.Nil {
 		ls.services.Logger.Println("Error while getting key from memstore: ", err)
 	}
@@ -124,8 +121,8 @@ func (ls *Links) findInMemstoreByURL(url string) *Link {
 func (ls *Links) createInMemstore(l *Link) {
 	if link, err := l.Marshal(); err == nil {
 		pipe := ls.services.IMDS.Client.TxPipeline()
-		pipe.Set(context.Background(), "short_uri:"+l.ShortURI, link, 0)
-		pipe.Set(context.Background(), "url:"+string(l.URL), l.ShortURI, 0)
+		pipe.Set(context.Background(), "id:"+fmt.Sprint(l.id), link, 0)
+		pipe.Set(context.Background(), "url:"+l.URL, l.id, 0)
 		if _, err := pipe.Exec(context.Background()); err != nil {
 			ls.services.Logger.Println("Error while setting link in memstore: ", err)
 		}
