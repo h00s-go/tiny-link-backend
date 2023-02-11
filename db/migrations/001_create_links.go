@@ -6,6 +6,7 @@ const CreateLinks = `
 	CREATE TABLE IF NOT EXISTS links (
 		id bigserial PRIMARY KEY,
 		url text UNIQUE NOT NULL,
+		created_by varchar(45) NOT NULL,
 		created_at timestamp NOT NULL
 	);
 	

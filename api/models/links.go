@@ -31,7 +31,7 @@ func (ls *Links) FindByID(id int64) (*Link, error) {
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.ID, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByID, id).Scan(&l.ID, &l.URL, &l.CreatedBy, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -46,7 +46,7 @@ func (ls *Links) FindByURL(URL string) (*Link, error) {
 	}
 
 	l := &Link{}
-	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.ID, &l.URL, &l.CreatedAt); err != nil {
+	if err := ls.services.DB.Conn.QueryRow(context.Background(), sql.GetLinkByURL, URL).Scan(&l.ID, &l.URL, &l.CreatedBy, &l.CreatedAt); err != nil {
 		return nil, err
 	}
 
@@ -55,12 +55,11 @@ func (ls *Links) FindByURL(URL string) (*Link, error) {
 	return l, nil
 }
 
-func (ls *Links) Create(URL string) (*Link, error) {
-	if l, err := ls.FindByURL(URL); err == nil {
+func (ls *Links) Create(l *Link) (*Link, error) {
+	if l, err := ls.FindByURL(l.URL); err == nil {
 		return l, nil
 	}
 
-	l := &Link{URL: URL}
 	h := NewHost(l.URL)
 	if err := h.IsValid(); err != nil {
 		return nil, err
@@ -71,7 +70,7 @@ func (ls *Links) Create(URL string) (*Link, error) {
 		return nil, err
 	}
 
-	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL).Scan(&l.ID); err != nil {
+	if err := tx.QueryRow(context.Background(), sql.CreateLink, l.URL, l.CreatedBy).Scan(&l.ID); err != nil {
 		tx.Rollback(context.Background())
 		return nil, err
 	}

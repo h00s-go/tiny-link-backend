@@ -12,6 +12,7 @@ type Link struct {
 	ID        int64     `json:"-"`
 	ShortURI  string    `json:"short_uri"`
 	URL       string    `json:"url"`
+	CreatedBy string    `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
 }
 

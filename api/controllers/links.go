@@ -27,11 +27,12 @@ func RedirectLinkByShortURIHandler(c *fiber.Ctx) error {
 func CreateLinkHandler(c *fiber.Ctx) error {
 	links := middleware.GetModels(c).Links
 	link := new(models.Link)
+	link.CreatedBy = c.IP()
 	if err := c.BodyParser(link); err != nil {
 		return c.SendStatus(400)
 	}
 
-	if link, err := links.Create(link.URL); err == nil {
+	if link, err := links.Create(link); err == nil {
 		c.JSON(link)
 		return c.SendStatus(201)
 	} else {
