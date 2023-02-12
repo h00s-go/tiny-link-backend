@@ -10,7 +10,6 @@ const ValidChars = "bcdfghmnprstvz23456789"
 
 type Link struct {
 	ID        int64     `json:"-"`
-	ShortURI  string    `json:"short_uri"`
 	URL       string    `json:"url"`
 	CreatedBy string    `json:"-"`
 	CreatedAt time.Time `json:"created_at"`
@@ -27,6 +26,17 @@ func (link *Link) MarshalJSON() ([]byte, error) {
 		ShortURI:  ShortURIfromID(link.ID),
 		AliasLink: (*AliasLink)(link),
 	})
+}
+
+func (link *Link) UnmarshalJSON(data []byte) error {
+	l := &PublicLink{
+		AliasLink: (*AliasLink)(link),
+	}
+	if err := json.Unmarshal(data, &l); err != nil {
+		return err
+	}
+	link.ID = IDfromShortURI(l.ShortURI)
+	return nil
 }
 
 func ShortURIfromID(id int64) string {
