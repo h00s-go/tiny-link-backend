@@ -93,6 +93,7 @@ func (ls *Links) findInMemstoreByID(id int64) *Link {
 			ls.services.Logger.Println("Error while unmarshaling link: ", err)
 			return nil
 		}
+		l.ID = id
 		return l
 	} else if err != redis.Nil {
 		ls.services.Logger.Println("Error while getting key from memstore: ", err)
@@ -109,7 +110,7 @@ func (ls *Links) findInMemstoreByURL(url string) *Link {
 			ls.services.Logger.Println("Error converting string to int64:", err)
 			return nil
 		}
-		return ls.findInMemstoreByID(int64(id))
+		return ls.findInMemstoreByID(id)
 	} else if err != redis.Nil {
 		ls.services.Logger.Println("Error while getting key from memstore: ", err)
 	}
