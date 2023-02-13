@@ -5,8 +5,10 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/h00s-go/tiny-link-backend/api/middleware"
 	"github.com/h00s-go/tiny-link-backend/config"
 	"github.com/h00s-go/tiny-link-backend/db"
@@ -27,6 +29,10 @@ func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore,
 
 	server.Use(servicesMiddleware.ServicesMiddleware)
 	server.Use(modelsMiddleware.ModelsMiddleware)
+	server.Use(limiter.New(limiter.Config{
+		Max:        20,
+		Expiration: 30 * time.Second,
+	}))
 
 	return &API{
 		config:   config,
