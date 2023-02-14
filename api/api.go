@@ -30,8 +30,9 @@ func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore,
 	server.Use(servicesMiddleware.ServicesMiddleware)
 	server.Use(modelsMiddleware.ModelsMiddleware)
 	server.Use(limiter.New(limiter.Config{
-		Max:        20,
-		Expiration: 30 * time.Second,
+		Next:       middleware.Throttling,
+		Max:        10,
+		Expiration: time.Minute,
 	}))
 
 	return &API{
