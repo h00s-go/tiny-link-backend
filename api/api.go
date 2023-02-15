@@ -30,15 +30,10 @@ func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore,
 	server.Use(servicesMiddleware.ServicesMiddleware)
 	server.Use(modelsMiddleware.ModelsMiddleware)
 	server.Use(limiter.New(limiter.Config{
-		Next:       middleware.Throttling,
-		Max:        10,
-		Expiration: time.Minute,
-		LimitReached: func(c *fiber.Ctx) error {
-			services.Logger.Println("Throttling client: " + c.IP())
-			return c.Status(http.StatusTooManyRequests).JSON(fiber.Map{
-				"error": "Too many requests",
-			})
-		},
+		Next:         middleware.Throttling,
+		LimitReached: middleware.ThrottleClient,
+		Max:          10,
+		Expiration:   time.Minute,
 	}))
 
 	return &API{
