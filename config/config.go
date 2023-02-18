@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Database Database
 	MemStore MemStore
+	Limiter  Limiter
 }
 
 type Database struct {
@@ -26,6 +27,11 @@ type MemStore struct {
 	Port     string
 	Password string
 	Database int
+}
+
+type Limiter struct {
+	Max        int
+	Expiration int
 }
 
 func NewConfig() *Config {
@@ -61,6 +67,9 @@ func (c *Config) applyEnvirontmentVariables() {
 	applyEnvirontmentVariable("MEMSTORE_PORT", &c.MemStore.Port)
 	applyEnvirontmentVariable("MEMSTORE_PASSWORD", &c.MemStore.Password)
 	applyEnvirontmentVariable("MEMSTORE_DATABASE", &c.MemStore.Database)
+
+	applyEnvirontmentVariable("LIMITER_MAX", &c.Limiter.Max)
+	applyEnvirontmentVariable("LIMITER_EXPIRATION", &c.Limiter.Expiration)
 }
 
 func applyEnvirontmentVariable(key string, value interface{}) {

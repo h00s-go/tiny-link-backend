@@ -5,22 +5,33 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/h00s-go/tiny-link-backend/config"
 )
 
-func LimiterMiddleware() func(*fiber.Ctx) error {
+type LimiterMiddleware struct {
+	config *config.Limiter
+}
+
+func NewLimiterMiddleware(config *config.Limiter) *LimiterMiddleware {
+	return &LimiterMiddleware{
+		config: config,
+	}
+}
+
+func (l *LimiterMiddleware) LimiterMiddleware() func(*fiber.Ctx) error {
 	return limiter.New(limiter.Config{
-		Max:          10,
-		Expiration:   time.Minute,
-		Next:         throttling,
-		LimitReached: throttleClient,
+		Max:          l.config.Max,
+		Expiration:   time.Duration(l.config.Expiration) * time.Second,
+		Next:         l.throttling,
+		LimitReached: l.throttleClient,
 	})
 }
 
-func throttling(c *fiber.Ctx) bool {
+func (l *LimiterMiddleware) throttling(c *fiber.Ctx) bool {
 	return c.Method() != "POST"
 }
 
-func throttleClient(c *fiber.Ctx) error {
+func (l *LimiterMiddleware) throttleClient(c *fiber.Ctx) error {
 	GetServices(c).Logger.Println("Throttling client: " + c.IP())
 	return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
 		"error": "Too many requests",
