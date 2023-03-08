@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/BurntSushi/toml v1.2.1
 	github.com/gofiber/fiber/v2 v2.42.0
-	github.com/jackc/pgx/v5 v5.3.0
+	github.com/jackc/pgx/v5 v5.3.1
 	github.com/redis/go-redis/v9 v9.0.2
 	golang.org/x/net v0.7.0
 )
