@@ -60,11 +60,6 @@ func (ls *Links) Create(l *Link) (*Link, error) {
 		return l, nil
 	}
 
-	h := NewHost(l.URL)
-	if err := h.IsValid(); err != nil {
-		return nil, err
-	}
-
 	tx, err := ls.services.DB.Conn.Begin(context.Background())
 	if err != nil {
 		return nil, err

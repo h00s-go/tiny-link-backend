@@ -32,6 +32,10 @@ func CreateLinkHandler(c *fiber.Ctx) error {
 		return c.SendStatus(400)
 	}
 
+	if link.Validate() != nil {
+		return c.SendStatus(400)
+	}
+
 	if link, err := links.Create(link); err == nil {
 		c.JSON(link)
 		return c.SendStatus(201)

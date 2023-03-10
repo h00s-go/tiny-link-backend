@@ -55,3 +55,11 @@ func IDfromShortURI(uri string) int64 {
 	}
 	return id
 }
+
+func (l *Link) Validate() error {
+	h := NewHost(l.URL)
+	if err := h.IsValid(); err != nil {
+		return err
+	}
+	return nil
+}
