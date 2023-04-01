@@ -8,7 +8,7 @@ jobs:
       run: env
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ vars.DOCKER_IMAGE_TAG }}:latest
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_IMAGE_TAG }}:latest
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
@@ -18,4 +18,4 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         push: true
-        tags: ${{ vars.DOCKER_IMAGE_TAG }}:latest
+        tags: ${{ secrets.DOCKER_IMAGE_TAG }}:latest
