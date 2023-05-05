@@ -9,7 +9,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/h00s-go/tiny-link-backend/api/middleware"
 	"github.com/h00s-go/tiny-link-backend/config"
-	"github.com/h00s-go/tiny-link-backend/db"
 	"github.com/h00s-go/tiny-link-backend/services"
 )
 
@@ -19,9 +18,9 @@ type API struct {
 	services *services.Services
 }
 
-func NewAPI(config *config.Config, database *db.Database, memStore *db.MemStore, logger *log.Logger) *API {
+func NewAPI(config *config.Config, logger *log.Logger) *API {
 	server := fiber.New()
-	services := services.NewServices(database, memStore, logger)
+	services := services.NewServices(config, logger)
 	servicesMiddleware := middleware.NewServicesMiddleware(services)
 	modelsMiddleware := middleware.NewModelsMiddleware(services)
 	limiterMiddleware := middleware.NewLimiterMiddleware(&config.Limiter)
@@ -51,6 +50,7 @@ func (api *API) WaitForShutdown() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
+	api.services.Close()
 	if err := api.server.Shutdown(); err != nil {
 		api.services.Logger.Fatal(err)
 	}
