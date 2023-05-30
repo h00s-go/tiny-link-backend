@@ -3,10 +3,10 @@ module github.com/h00s-go/tiny-link-backend
 go 1.20
 
 require (
-	github.com/BurntSushi/toml v1.2.1
+	github.com/BurntSushi/toml v1.3.0
 	github.com/gofiber/fiber/v2 v2.46.0
 	github.com/jackc/pgx/v5 v5.3.1
-	github.com/redis/go-redis/v9 v9.0.4
+	github.com/redis/go-redis/v9 v9.0.5
 	golang.org/x/net v0.10.0
 )
 
